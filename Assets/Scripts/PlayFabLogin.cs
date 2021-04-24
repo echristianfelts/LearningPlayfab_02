@@ -20,8 +20,21 @@ public class PlayFabLogin : MonoBehaviour
         //      var request = new LoginWithCustomIDRequest { CustomId = "GettingStartedGuide", CreateAccount = true };
         //      PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnLoginFailure);
 
-        var request = new LoginWithEmailAddressRequest { Email = userEmail, Password = userPassword };
-        PlayFabClientAPI.LoginWithEmailAddress(request, OnLoginSuccess, OnLoginFailure);
+        if (PlayerPrefs.HasKey("EMAIL"))
+        {
+
+            // "If our EMAIL key exists, then most likely, our PASSWORD key will exist as well 
+            //  because we are setting those player preferences at the same time...  So if the EMAIL exists, 
+            //  then we want to take the EMAIL and the PASSWORD and put them int thier variables..."
+            //          Not sure I follow.  I will follow up.
+            //
+            //Upon Review...  This should check for the PW also. 
+
+            userEmail = PlayerPrefs.GetString("EMAIL");
+            userPassword = PlayerPrefs.GetString("PASSWORD");
+            var request = new LoginWithEmailAddressRequest { Email = userEmail, Password = userPassword };
+            PlayFabClientAPI.LoginWithEmailAddress(request, OnLoginSuccess, OnLoginFailure);
+        }
 
 
 
@@ -30,12 +43,20 @@ public class PlayFabLogin : MonoBehaviour
     private void OnLoginSuccess(LoginResult result)
     {
         Debug.Log("On<color=red>Login</color>Success:Congratulations, you made your first successful API call!");
+        // This is what remembers your email and Password.
+        PlayerPrefs.SetString("EMAIL", userEmail);
+        PlayerPrefs.SetString("PASSWORD", userPassword);
+
     }
 
     private void OnRegisterSuccess(RegisterPlayFabUserResult result)
     {
         Debug.Log("On<color=red>Register</color>Success: Congratulations, you made your first successful API call!");
+        // This is what remembers your email and Password.
+        PlayerPrefs.SetString("EMAIL", userEmail);
+        PlayerPrefs.SetString("PASSWORD", userPassword);
     }
+
 
     private void OnLoginFailure(PlayFabError error)
     {
@@ -46,6 +67,10 @@ public class PlayFabLogin : MonoBehaviour
         // So right now this says that if the initial log in fails, then go right to setting up an account.  
         // For the final version there will have to be a gap between those two events.
         // An option notification. A press this then it happens kind of thing...
+        // This should go to a screen that does this.  
+        // There should be a homescreen "register" button that goes to the same place.
+        // A "Login Falure/First Time Registration" Screen.
+        
 
         var registerRequest = new RegisterPlayFabUserRequest { Email = userEmail, Password = userPassword, Username = username};
         PlayFabClientAPI.RegisterPlayFabUser (registerRequest, OnRegisterSuccess, OnRegisterFailure);
