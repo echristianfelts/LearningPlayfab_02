@@ -21,6 +21,10 @@ public class PlayFabLogin : MonoBehaviour
         //      var request = new LoginWithCustomIDRequest { CustomId = "GettingStartedGuide", CreateAccount = true };
         //      PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnLoginFailure);
 
+
+        //      PlayerPrefs.DeleteAll();
+
+
         if (PlayerPrefs.HasKey("EMAIL"))
         {
 
@@ -36,6 +40,7 @@ public class PlayFabLogin : MonoBehaviour
             var request = new LoginWithEmailAddressRequest { Email = userEmail, Password = userPassword };
             PlayFabClientAPI.LoginWithEmailAddress(request, OnLoginSuccess, OnLoginFailure);
         }
+        
 
 
 
