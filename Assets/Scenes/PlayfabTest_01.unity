@@ -857,6 +857,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loginPanel: {fileID: 1579757318}
+  addLoginPanel: {fileID: 0}
+  recoverButton: {fileID: 0}
 --- !u!1 &395786802
 GameObject:
   m_ObjectHideFlags: 0
@@ -942,7 +944,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 341456132}
         m_TargetAssemblyTypeName: PlayFabLogin, Assembly-CSharp
-        m_MethodName: OnClickLogin
+        m_MethodName: OpenAddLogin
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3540,7 +3542,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 341456132}
         m_TargetAssemblyTypeName: PlayFabLogin, Assembly-CSharp
-        m_MethodName: OnClickLogin
+        m_MethodName: OnClickAddLogin
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -10,6 +10,8 @@ public class PlayFabLogin : MonoBehaviour
     private string userPassword;
     private string username;
     public GameObject loginPanel;
+    public GameObject addLoginPanel;
+    public GameObject recoverButton;
 
     public void Start()
     {
@@ -64,7 +66,7 @@ public class PlayFabLogin : MonoBehaviour
         PlayerPrefs.SetString("EMAIL", userEmail);
         PlayerPrefs.SetString("PASSWORD", userPassword);
         loginPanel.SetActive(false); //we should probably be doing this AFTER setting up the panel and making sure that it works...  but ok...
-
+        recoverButton.SetActive(false);
     }
 
     private void OnLoginMobileSuccess(LoginResult result)
@@ -141,4 +143,27 @@ public class PlayFabLogin : MonoBehaviour
         string deviceID = SystemInfo.deviceUniqueIdentifier;
         return deviceID;
     }
+
+    public void OpenAddLogin()
+    {
+        addLoginPanel.SetActive(true);
+    }
+
+    public void OnClickAddLogin()
+    {
+        var addLoginRequest = new AddUsernamePasswordRequest { Email = userEmail, Password = userPassword, Username = username };
+        PlayFabClientAPI.AddUsernamePassword(addLoginRequest, OnAddLoginSuccess, OnRegisterFailure);
+    }
+
+    private void OnAddLoginSuccess(AddUsernamePasswordResult result)
+    {
+        Debug.Log("On<color=red>Register</color>Success: Congratulations, you made your first successful API call!");
+        // This is what remembers your email and Password.
+        PlayerPrefs.SetString("EMAIL", userEmail);
+        PlayerPrefs.SetString("PASSWORD", userPassword);
+        loginPanel.SetActive(false); //we should probably be doing this AFTER setting up the panel and making sure that it works...  but ok...
+
+    }
+
+
 }
