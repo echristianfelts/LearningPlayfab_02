@@ -59,6 +59,8 @@ public class PlayFabController : MonoBehaviour
 
     }
 
+    #region Login
+
     private void OnLoginSuccess(LoginResult result)
     {
         Debug.Log("On<color=red>Login</color>Success:Congratulations, you made your first successful API call!");
@@ -165,5 +167,22 @@ public class PlayFabController : MonoBehaviour
 
     }
 
+    #endregion
+
+    public int playerLevel;
+    public int gameLevel;
+
+    public int playerHealth;
+    public int playerDamage;
+
+    public int playerHighScore;
+
+    public int numberofTimesPlayed;
+    public int numberofWins;
+
+    #region PlayerStats
+
+    
+    #endregion PlayerStats
 
 }
