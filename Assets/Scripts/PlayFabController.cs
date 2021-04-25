@@ -4,7 +4,7 @@ using PlayFab;
 using PlayFab.ClientModels;
 using UnityEngine;
 
-public class PlayFabLogin : MonoBehaviour
+public class PlayFabController : MonoBehaviour
 {
     private string userEmail;
     private string userPassword;
