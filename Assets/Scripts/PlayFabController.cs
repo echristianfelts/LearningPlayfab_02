@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using PlayFab;
 using PlayFab.ClientModels;
 using UnityEngine;
+using PlayFab.Json;
+using UnityEngine.UI;
 
 public class PlayFabController : MonoBehaviour
 {
@@ -17,13 +19,13 @@ public class PlayFabController : MonoBehaviour
 
     private void OnEnable()
     {
-        if(PlayFabController.PFC == null)
+        if (PlayFabController.PFC == null)
         {
             PlayFabController.PFC = this;
         }
         else
         {
-            if(PlayFabController.PFC != this)
+            if (PlayFabController.PFC != this)
             {
                 Destroy(this.gameObject);
             }
@@ -94,7 +96,7 @@ public class PlayFabController : MonoBehaviour
     {
         Debug.Log("On<color=red>Login</color>Success:Congratulations, you made your first successful API call!");
         GetStats();         //Gets the stats from the server..?  I don't know.  I am starting to get lost.
-        loginPanel.SetActive(false); 
+        loginPanel.SetActive(false);
 
     }
 
@@ -204,8 +206,8 @@ public class PlayFabController : MonoBehaviour
     #region PlayerStats
 
     public void SetStats() // Basic test here copy pasted from https://docs.microsoft.com/en-us/gaming/playfab/features/data/playerdata/using-player-statistics
-        // This function gets called any time we want to push new information to the cloud.
-        // to call use PlayFabController.PFC.SetStats();
+                           // This function gets called any time we want to push new information to the cloud.
+                           // to call use PlayFabController.PFC.SetStats();
     {
         PlayFabClientAPI.UpdatePlayerStatistics(new UpdatePlayerStatisticsRequest
         {
@@ -213,12 +215,12 @@ public class PlayFabController : MonoBehaviour
             Statistics = new List<StatisticUpdate> {
             //  new StatisticUpdate { StatisticName = "strength", Value = 18 },     //The value and the change.  These are the original values.
             new StatisticUpdate { StatisticName = "STATPlayerLevel", Value = playerLevel },         //Setting the name of the statistic and assigning it a local variable.
-            new StatisticUpdate { StatisticName = "STATGameLevel", Value = gameLevel },         
-            new StatisticUpdate { StatisticName = "STATPlayerHealth", Value = playerHealth },      
-            new StatisticUpdate { StatisticName = "STATPlayerDamage", Value = playerDamage },        
-            new StatisticUpdate { StatisticName = "STATPlayerHighScore", Value = playerHighScore },       
-            new StatisticUpdate { StatisticName = "STATPlayerTotalPlays", Value = numberofTimesPlayed },       
-            new StatisticUpdate { StatisticName = "STATPlayerWins", Value = numberofWins },        
+            new StatisticUpdate { StatisticName = "STATGameLevel", Value = gameLevel },
+            new StatisticUpdate { StatisticName = "STATPlayerHealth", Value = playerHealth },
+            new StatisticUpdate { StatisticName = "STATPlayerDamage", Value = playerDamage },
+            new StatisticUpdate { StatisticName = "STATPlayerHighScore", Value = playerHighScore },
+            new StatisticUpdate { StatisticName = "STATPlayerTotalPlays", Value = numberofTimesPlayed },
+            new StatisticUpdate { StatisticName = "STATPlayerWins", Value = numberofWins },
             }
         },                                                              // The above is setting the Request and the values that we want to change.    
         result => { Debug.Log("User statistics updated"); },            // Callback for succsessful post
@@ -240,7 +242,7 @@ public class PlayFabController : MonoBehaviour
         foreach (var eachStat in result.Statistics)
         {
             Debug.Log("Statistic (" + eachStat.StatisticName + "): " + eachStat.Value);
-            switch(eachStat.StatisticName)
+            switch (eachStat.StatisticName)
             {
                 case "STATPlayerLevel":
                     playerLevel = eachStat.Value;
@@ -273,6 +275,43 @@ public class PlayFabController : MonoBehaviour
             }
         }
     }
+
+
+    // Build the request object and access the API
+    public void StartCloudUpdatePlayerStats()
+    {
+        PlayFabClientAPI.ExecuteCloudScript(new ExecuteCloudScriptRequest()
+        {
+            FunctionName = "UpdatePlayerStats", // Arbitrary function name (must exist in your uploaded cloud.js file)
+            FunctionParameter = new {
+                CLDPlayerLevel = playerLevel,
+                CLDGameLevel = gameLevel,
+                CLDPlayerHealth = playerHealth,
+                CLDPlayerDamage = playerDamage,
+                CLDPlayerHighScore = playerHighScore,
+                CLDNumberofTimesPlayed = numberofTimesPlayed,
+                CLDNumberofWins = numberofWins
+            }, // The parameter provided to your function
+            GeneratePlayStreamEvent = true, // Optional - Shows this event in PlayStream
+        }, OnCloudUpdateStats, OnErrorShared);
+    }
+    // OnCloudHelloWorld defined in the next code block
+
+    private static void OnCloudUpdateStats(ExecuteCloudScriptResult result)
+    {
+        // CloudScript returns arbitrary results, so you have to evaluate them one step and one parameter at a time
+        Debug.Log(result.FunctionResult.ToString() as string);  // original line follows :  Debug.Log(JsonWrapper.SerializeObject(result.FunctionResult));
+        JsonObject jsonResult = (JsonObject)result.FunctionResult;
+        object messageValue;
+        jsonResult.TryGetValue("messageValue", out messageValue); // note how "messageValue" directly corresponds to the JSON values set in CloudScript
+        Debug.Log((string)messageValue);
+    }
+
+    private static void OnErrorShared(PlayFabError error)
+    {
+        Debug.Log(error.GenerateErrorReport());
+    }
+
 
     #endregion PlayerStats
 
