@@ -6,12 +6,30 @@ using UnityEngine;
 
 public class PlayFabController : MonoBehaviour
 {
+    public static PlayFabController PFC;
+
     private string userEmail;
     private string userPassword;
     private string username;
     public GameObject loginPanel;
     public GameObject addLoginPanel;
     public GameObject recoverButton;
+
+    private void OnEnable()
+    {
+        if(PlayFabController.PFC == null)
+        {
+            PlayFabController.PFC = this;
+        }
+        else
+        {
+            if(PlayFabController.PFC != this)
+            {
+                Destroy(this.gameObject);
+            }
+        }
+        DontDestroyOnLoad(this.gameObject);
+    }
 
     public void Start()
     {
@@ -69,12 +87,13 @@ public class PlayFabController : MonoBehaviour
         PlayerPrefs.SetString("PASSWORD", userPassword);
         loginPanel.SetActive(false); //we should probably be doing this AFTER setting up the panel and making sure that it works...  but ok...
         recoverButton.SetActive(false);
+        GetStats();         //Gets the stats from the server..?  I don't know.  I am starting to get lost.
     }
 
     private void OnLoginMobileSuccess(LoginResult result)
     {
         Debug.Log("On<color=red>Login</color>Success:Congratulations, you made your first successful API call!");
-
+        GetStats();         //Gets the stats from the server..?  I don't know.  I am starting to get lost.
         loginPanel.SetActive(false); 
 
     }
@@ -85,6 +104,7 @@ public class PlayFabController : MonoBehaviour
         // This is what remembers your email and Password.
         PlayerPrefs.SetString("EMAIL", userEmail);
         PlayerPrefs.SetString("PASSWORD", userPassword);
+        GetStats();         //Gets the stats from the server..?  The player should not have any values at this point, though...
         loginPanel.SetActive(false); //we should probably be doing this AFTER setting up the panel and making sure that it works...  but ok...
 
     }
@@ -163,6 +183,7 @@ public class PlayFabController : MonoBehaviour
         // This is what remembers your email and Password.
         PlayerPrefs.SetString("EMAIL", userEmail);
         PlayerPrefs.SetString("PASSWORD", userPassword);
+        GetStats();         //Gets the stats from the server..?  Sure.  Why not?  The tut was not clear as to the gain.  If it messes stuff up, this is the first thing to get commented out.
         addLoginPanel.SetActive(false);
 
     }
@@ -182,7 +203,77 @@ public class PlayFabController : MonoBehaviour
 
     #region PlayerStats
 
-    
+    public void SetStats() // Basic test here copy pasted from https://docs.microsoft.com/en-us/gaming/playfab/features/data/playerdata/using-player-statistics
+        // This function gets called any time we want to push new information to the cloud.
+        // to call use PlayFabController.PFC.SetStats();
+    {
+        PlayFabClientAPI.UpdatePlayerStatistics(new UpdatePlayerStatisticsRequest
+        {
+            // request.Statistics is a list, so multiple StatisticUpdate objects can be defined if required.
+            Statistics = new List<StatisticUpdate> {
+            //  new StatisticUpdate { StatisticName = "strength", Value = 18 },     //The value and the change.  These are the original values.
+            new StatisticUpdate { StatisticName = "STATPlayerLevel", Value = playerLevel },         //Setting the name of the statistic and assigning it a local variable.
+            new StatisticUpdate { StatisticName = "STATGameLevel", Value = gameLevel },         
+            new StatisticUpdate { StatisticName = "STATPlayerHealth", Value = playerHealth },      
+            new StatisticUpdate { StatisticName = "STATPlayerDamage", Value = playerDamage },        
+            new StatisticUpdate { StatisticName = "STATPlayerHighScore", Value = playerHighScore },       
+            new StatisticUpdate { StatisticName = "STATPlayerTotalPlays", Value = numberofTimesPlayed },       
+            new StatisticUpdate { StatisticName = "STATPlayerWins", Value = numberofWins },        
+            }
+        },                                                              // The above is setting the Request and the values that we want to change.    
+        result => { Debug.Log("User statistics updated"); },            // Callback for succsessful post
+        error => { Debug.LogError(error.GenerateErrorReport()); });     // Callback for failed post
+    }
+
+    void GetStats()
+    {
+        PlayFabClientAPI.GetPlayerStatistics(
+            new GetPlayerStatisticsRequest(),
+            OnGetStatistics,
+            error => Debug.LogError(error.GenerateErrorReport())
+        );
+    }
+
+    void OnGetStatistics(GetPlayerStatisticsResult result)
+    {
+        Debug.Log("Received the following Statistics:");
+        foreach (var eachStat in result.Statistics)
+        {
+            Debug.Log("Statistic (" + eachStat.StatisticName + "): " + eachStat.Value);
+            switch(eachStat.StatisticName)
+            {
+                case "STATPlayerLevel":
+                    playerLevel = eachStat.Value;
+                    break;
+
+                case "STATGameLevel":
+                    playerLevel = eachStat.Value;
+                    break;
+
+                case "STATPlayerHealth":
+                    playerLevel = eachStat.Value;
+                    break;
+
+                case "STATPlayerDamage":
+                    playerLevel = eachStat.Value;
+                    break;
+
+                case "STATPlayerHighScore":
+                    playerLevel = eachStat.Value;
+                    break;
+
+                case "STATPlayerTotalPlays":
+                    playerLevel = eachStat.Value;
+                    break;
+
+                case "STATPlayerWins":
+                    playerLevel = eachStat.Value;
+                    break;
+
+            }
+        }
+    }
+
     #endregion PlayerStats
 
 }
