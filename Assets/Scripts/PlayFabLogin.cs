@@ -161,7 +161,7 @@ public class PlayFabLogin : MonoBehaviour
         // This is what remembers your email and Password.
         PlayerPrefs.SetString("EMAIL", userEmail);
         PlayerPrefs.SetString("PASSWORD", userPassword);
-        loginPanel.SetActive(false); //we should probably be doing this AFTER setting up the panel and making sure that it works...  but ok...
+        addLoginPanel.SetActive(false);
 
     }
 
